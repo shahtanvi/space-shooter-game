@@ -136,19 +136,18 @@ class GameScene extends Phaser.Scene {
 
       const fx = this.mobileControls.fingerX;
       if (fx !== null) {
+        const prevX   = this.player.x;
         const targetX = Phaser.Math.Clamp(fx, 20, this.scale.width - 20);
-        const dx      = targetX - this.player.x;
-        // Proportional velocity towards finger — feels snappy but not instant
-        const vx = Phaser.Math.Clamp(dx * 12, -baseSpeed, baseSpeed);
-        this.player.setVelocityX(vx);
-        if (dx < -4)      this.player.setFrame(1);
-        else if (dx > 4)  this.player.setFrame(3);
+        this.player.setPosition(targetX, this.player.y);
+        this.player.setVelocity(0, 0);
+        const dx = targetX - prevX;
+        if (dx < -2)      this.player.setFrame(1);
+        else if (dx > 2)  this.player.setFrame(3);
         else              this.player.setFrame(0);
       } else {
-        this.player.setVelocityX(0);
+        this.player.setVelocity(0, 0);
         this.player.setFrame(0);
       }
-      this.player.setVelocityY(0);
 
       if (this._debugText) {
         this._debugText.setText(`finger: ${fx !== null ? Math.round(fx) : '—'}  ship: ${Math.round(this.player.x)}`);

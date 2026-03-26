@@ -56,8 +56,10 @@ class GameOverScene extends Phaser.Scene {
 
     this.add.text(W / 2, H - 110, '─────────────────────', mono(13, '#333366')).setOrigin(0.5);
 
-    // Blinking prompt
-    const prompt = this.add.text(W / 2, H - 80, 'PRESS  SPACE  TO  PLAY  AGAIN', mono(15, '#88ffaa'))
+    // Blinking prompt — text differs by device
+    const isMobile   = MobileControls.isMobile();
+    const promptText = isMobile ? 'TAP  TO  PLAY  AGAIN' : 'PRESS  SPACE  TO  PLAY  AGAIN';
+    const prompt = this.add.text(W / 2, H - 80, promptText, mono(15, '#88ffaa'))
       .setOrigin(0.5);
 
     this.tweens.add({
@@ -70,8 +72,10 @@ class GameOverScene extends Phaser.Scene {
     });
 
     // Return to Start screen (which shows updated leaderboard)
-    this.input.keyboard.once('keydown-SPACE', () => {
-      this.scene.start('StartScene');
-    });
+    if (isMobile) {
+      this.input.once('pointerdown', () => this.scene.start('StartScene'));
+    } else {
+      this.input.keyboard.once('keydown-SPACE', () => this.scene.start('StartScene'));
+    }
   }
 }

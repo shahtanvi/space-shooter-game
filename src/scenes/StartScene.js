@@ -4,8 +4,9 @@ class StartScene extends Phaser.Scene {
   }
 
   create() {
-    const W = this.scale.width;
-    const H = this.scale.height;
+    const W        = this.scale.width;
+    const H        = this.scale.height;
+    const isMobile = MobileControls.isMobile();
 
     const mono = (size, color = '#ffffff') => ({
       fontFamily: '"Courier New", monospace',
@@ -27,8 +28,13 @@ class StartScene extends Phaser.Scene {
 
     // ── Controls legend ───────────────────────────────────────────────────────
     const ctrlStyle = mono(12, '#888899');
-    this.add.text(W / 2, 240, 'ARROWS / WASD  Move     SPACE  Fire     P  Pause', ctrlStyle)
-      .setOrigin(0.5);
+    if (isMobile) {
+      this.add.text(W / 2, 240, 'TILT  Move     HOLD RIGHT  Fire', ctrlStyle)
+        .setOrigin(0.5);
+    } else {
+      this.add.text(W / 2, 240, 'ARROWS / WASD  Move     SPACE  Fire     P  Pause', ctrlStyle)
+        .setOrigin(0.5);
+    }
 
     this.add.text(W / 2, 262, '─────────────────────', mono(13, '#333366'))
       .setOrigin(0.5);
@@ -55,7 +61,8 @@ class StartScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     // ── Blinking start prompt ─────────────────────────────────────────────────
-    const prompt = this.add.text(W / 2, H - 96, 'PRESS  SPACE  TO  START', mono(17, '#88ff88'))
+    const promptText = isMobile ? 'TAP  TO  START' : 'PRESS  SPACE  TO  START';
+    const prompt = this.add.text(W / 2, H - 96, promptText, mono(17, '#88ff88'))
       .setOrigin(0.5);
 
     this.tweens.add({
@@ -68,12 +75,68 @@ class StartScene extends Phaser.Scene {
     });
 
     // ── Version tag ───────────────────────────────────────────────────────────
-    this.add.text(W / 2, H - 24, 'MILESTONE 3', mono(11, '#333344'))
+    this.add.text(W / 2, H - 24, 'MILESTONE 4', mono(11, '#333344'))
       .setOrigin(0.5);
 
-    // Space to start
-    this.input.keyboard.once('keydown-SPACE', () => {
-      this.scene.start('GameScene');
+    // ── Input ─────────────────────────────────────────────────────────────────
+    if (isMobile) {
+      this.input.once('pointerdown', () => this._mobileStart());
+    } else {
+      this.input.keyboard.once('keydown-SPACE', () => {
+        this.scene.start('GameScene', { calibration: 0 });
+      });
+    }
+  }
+
+  // ─── Mobile start flow ─────────────────────────────────────────────────────
+
+  _mobileStart() {
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      // iOS 13+ requires explicit permission from a user gesture
+      DeviceOrientationEvent.requestPermission()
+        .then(result => {
+          if (result === 'granted') {
+            this._captureCalibrationAndStart();
+          } else {
+            this._showPermissionDenied();
+          }
+        })
+        .catch(() => this._captureCalibrationAndStart());
+    } else {
+      // Android / other browsers — no permission needed
+      this._captureCalibrationAndStart();
+    }
+  }
+
+  // Listen for one orientation event to capture the player's natural holding angle.
+  _captureCalibrationAndStart() {
+    const onOrientation = (e) => {
+      window.removeEventListener('deviceorientation', onOrientation, true);
+      this.scene.start('GameScene', { calibration: e.gamma || 0 });
+    };
+    window.addEventListener('deviceorientation', onOrientation, true);
+
+    // Fallback: if the device fires no orientation event within 600 ms, start with 0°
+    this.time.delayedCall(600, () => {
+      window.removeEventListener('deviceorientation', onOrientation, true);
+      if (this.scene.isActive('StartScene')) {
+        this.scene.start('GameScene', { calibration: 0 });
+      }
     });
+  }
+
+  _showPermissionDenied() {
+    const W = this.scale.width;
+    const H = this.scale.height;
+    this.add.rectangle(W / 2, H / 2, W - 40, 110, 0x110011, 0.95)
+      .setOrigin(0.5)
+      .setDepth(20);
+    this.add.text(W / 2, H / 2, 'Motion access denied.\n\nGo to Settings > Safari >\nMotion & Orientation\nand enable access, then reload.', {
+      fontFamily: '"Courier New", monospace',
+      fontSize:   '13px',
+      fill:       '#ff6666',
+      align:      'center'
+    }).setOrigin(0.5).setDepth(21);
   }
 }

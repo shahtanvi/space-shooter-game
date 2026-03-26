@@ -43,6 +43,11 @@ class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' });
   }
 
+  // Receives calibration data passed from StartScene
+  init(data) {
+    this._calibration = data?.calibration ?? 0;
+  }
+
   // ─── PRELOAD ───────────────────────────────────────────────────────────────
   preload() {
     // Backgrounds
@@ -125,23 +130,37 @@ class GameScene extends Phaser.Scene {
     this.farPlanetsLayer.tilePositionY -= 0.9;
     this.starsLayer.tilePositionY      -= 1.8;
 
-    // Player movement
+    // Player movement + auto-fire
     const baseSpeed = this.speedBoostActive ? 308 : 220;  // +40 % with boost
-    const left  = this.cursors.left.isDown  || this.wasd.left.isDown;
-    const right = this.cursors.right.isDown || this.wasd.right.isDown;
-    const up    = this.cursors.up.isDown    || this.wasd.up.isDown;
-    const down  = this.cursors.down.isDown  || this.wasd.down.isDown;
 
-    this.player.setVelocityX(left ? -baseSpeed : right ? baseSpeed : 0);
-    this.player.setVelocityY(up   ? -baseSpeed : down  ? baseSpeed : 0);
+    if (this.mobileControls) {
+      // Mobile: gyroscope drives X; Y is fixed (no vertical movement on mobile)
+      this.player.setVelocityX(this.mobileControls.tiltX * baseSpeed);
+      this.player.setVelocityY(0);
 
-    // Ship banking frames (0 = straight, 1 = lean left, 3 = lean right)
-    if (left)       this.player.setFrame(1);
-    else if (right) this.player.setFrame(3);
-    else            this.player.setFrame(0);
+      const tx = this.mobileControls.tiltX;
+      if (tx < -0.2)     this.player.setFrame(1);
+      else if (tx > 0.2) this.player.setFrame(3);
+      else               this.player.setFrame(0);
 
-    // Auto-fire
-    if (this.spaceKey.isDown && this.shootReady) this._shoot();
+      if (this.mobileControls.firing && this.shootReady) this._shoot();
+    } else {
+      // Desktop: keyboard
+      const left  = this.cursors.left.isDown  || this.wasd.left.isDown;
+      const right = this.cursors.right.isDown || this.wasd.right.isDown;
+      const up    = this.cursors.up.isDown    || this.wasd.up.isDown;
+      const down  = this.cursors.down.isDown  || this.wasd.down.isDown;
+
+      this.player.setVelocityX(left ? -baseSpeed : right ? baseSpeed : 0);
+      this.player.setVelocityY(up   ? -baseSpeed : down  ? baseSpeed : 0);
+
+      // Ship banking frames (0 = straight, 1 = lean left, 3 = lean right)
+      if (left)       this.player.setFrame(1);
+      else if (right) this.player.setFrame(3);
+      else            this.player.setFrame(0);
+
+      if (this.spaceKey.isDown && this.shootReady) this._shoot();
+    }
 
     // Big enemy sine-wave lateral drift
     this.bigEnemies.getChildren().forEach(e => {
@@ -225,6 +244,8 @@ class GameScene extends Phaser.Scene {
     this.boss             = null;
     this.bossActive       = false;
     this._bossPlanet      = null;
+    this.mobileControls   = null;
+    // _calibration is set in init() — not reset here so it survives create()
   }
 
   _createBackground() {
@@ -294,11 +315,14 @@ class GameScene extends Phaser.Scene {
     this.wasd     = this.input.keyboard.addKeys({ up: 'W', down: 'S', left: 'A', right: 'D' });
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.pKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
-    this.bKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.B);
 
     this.pKey.on('down', this._togglePause, this);
-    this.bKey.on('down', this._startBossHold, this);
-    this.bKey.on('up',   this._cancelBossHold, this);
+
+    // Mobile controls — gyro + fire button (only on touch devices)
+    if (MobileControls.isMobile()) {
+      this.mobileControls = new MobileControls(this);
+      this.mobileControls.init(this._calibration);
+    }
   }
 
   _createAudio() {
@@ -675,6 +699,7 @@ class GameScene extends Phaser.Scene {
       this.powerupManager.pause();
       if (this.boss) this.boss.pause();
       this.enemyFireTimer.paused = true;
+      if (this.mobileControls) this.mobileControls.pause();
       this.pauseOverlay.setVisible(true);
     } else {
       this.physics.resume();
@@ -683,6 +708,7 @@ class GameScene extends Phaser.Scene {
       this.powerupManager.resume();
       if (this.boss) this.boss.resume();
       this.enemyFireTimer.paused = false;
+      if (this.mobileControls) this.mobileControls.resume();
       this.pauseOverlay.setVisible(false);
     }
   }
@@ -742,31 +768,6 @@ class GameScene extends Phaser.Scene {
       ease:       'Power2',
       onComplete: () => banner.destroy()
     });
-  }
-
-  // ─── DEBUG ─────────────────────────────────────────────────────────────────
-
-  _startBossHold() {
-    if (this.gameEnding || this.bossActive) return;
-    this._bossHoldTimer = this.time.delayedCall(1000, () => {
-      this._bossHoldTimer = null;
-
-      // Jump to the next boss wave (nearest multiple of 10 above current wave)
-      const nextBossWave = Math.ceil((this.waveManager.wave + 1) / 10) * 10;
-      this.waveManager.wave = nextBossWave;
-      this.waveText.setText(`WAVE ${nextBossWave}`);
-
-      this.waveManager.stop();
-      this.waveManager.bossWaveActive = true;
-      this._showBossWarning(nextBossWave);
-    });
-  }
-
-  _cancelBossHold() {
-    if (this._bossHoldTimer) {
-      this._bossHoldTimer.remove();
-      this._bossHoldTimer = null;
-    }
   }
 
   // ─── BOSS ──────────────────────────────────────────────────────────────────

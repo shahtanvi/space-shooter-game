@@ -210,6 +210,37 @@ All paths are relative to `Legacy Collection/Assets/`.
 
 ---
 
+### Milestone 4 — Mobile (Gyroscope + Portrait)
+
+**Goal:** Make the game fully playable on a mobile browser using gyroscope tilt for movement and a hold-to-fire touch button. No virtual joystick — the screen stays clean.
+
+**New files:**
+
+- `src/ui/MobileControls.js` — gyroscope input handler and fire button overlay
+
+**Changes to existing files:**
+
+- `index.html` — disable pinch-to-zoom, prevent scroll/pull-to-refresh, add portrait orientation lock via Web App Manifest or `<meta>` tag
+- `src/scenes/StartScene.js` — add iOS motion permission request (triggered by the "Play" tap); skip on Android/desktop
+- `src/scenes/GameScene.js` — integrate `MobileControls`; lock player Y position on mobile; detect mobile vs desktop and switch input source accordingly
+
+**Features:**
+
+1. **Gyroscope movement** — left/right tilt (`gamma` axis from `DeviceOrientation` API) controls the ship's horizontal position
+   - Auto-calibrates on game start: the tilt angle at the moment "Play" is tapped becomes neutral center
+   - Dead zone of ±5° around center to prevent drift from minor wobble
+   - Player Y is fixed at the bottom of the screen on mobile (no vertical movement)
+2. **Hold-to-fire button** — large translucent button on the right half of the screen; auto-fires while held, matching spacebar behavior on desktop
+3. **Pause button** — small button in the top-right corner of the screen
+4. **iOS permission flow** — on iOS 13+, `DeviceOrientationEvent.requestPermission()` is called on the "Play" tap; if denied, game falls back to showing a message asking the player to enable motion access in Safari settings
+5. **Portrait lock** — game forces portrait orientation; landscape shows a "Rotate your device" overlay until the player rotates back
+6. **Touch hygiene** — canvas disables pinch-to-zoom, pull-to-refresh, and long-press context menu
+7. **Auto-detect** — mobile controls activate only when `navigator.maxTouchPoints > 0`; desktop keyboard controls remain unchanged
+
+**Definition of done:** Game is fully playable on an iPhone or Android phone in portrait mode using tilt-to-move and tap-to-fire, with no keyboard required.
+
+---
+
 ## File Structure (target end state)
 
 ```
@@ -232,6 +263,6 @@ space-shooter-game/
 │   │   ├── WaveManager.js
 │   │   └── PowerUpManager.js
 │   └── ui/
-│       └── TouchControls.js
+│       └── MobileControls.js
 └── Legacy Collection/       # pixel art assets (read-only)
 ```

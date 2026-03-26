@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Space Shooter</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -13,11 +13,57 @@
       align-items: center;
       height: 100vh;
       overflow: hidden;
+      overscroll-behavior: none;
+      -webkit-user-select: none;
+      user-select: none;
     }
-    canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+    canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      touch-action: none;
+    }
+
+    /* Landscape warning — shown on touch devices in landscape orientation */
+    #landscape-msg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000011;
+      z-index: 9999;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      color: #ffffff;
+      font-family: "Courier New", monospace;
+      text-align: center;
+    }
+    #landscape-msg .rotate-icon {
+      font-size: 52px;
+      animation: spin 2s linear infinite;
+    }
+    #landscape-msg .title  { font-size: 18px; letter-spacing: 2px; }
+    #landscape-msg .sub    { font-size: 12px; color: #555577; }
+    @keyframes spin {
+      0%   { transform: rotate(0deg);   }
+      25%  { transform: rotate(-90deg); }
+      75%  { transform: rotate(-90deg); }
+      100% { transform: rotate(-180deg); }
+    }
+    /* Only show on touch devices in landscape */
+    @media (orientation: landscape) and (hover: none) and (pointer: coarse) {
+      #landscape-msg { display: flex; }
+    }
   </style>
 </head>
 <body>
+  <!-- Portrait-only overlay — shown by CSS when touch device is in landscape -->
+  <div id="landscape-msg">
+    <div class="rotate-icon">&#8635;</div>
+    <div class="title">ROTATE YOUR DEVICE</div>
+    <div class="sub">This game is portrait only</div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
 
   <!-- Managers (must load before scenes that use them) -->
@@ -26,6 +72,9 @@
 
   <!-- Enemies -->
   <script src="src/enemies/Boss.js"></script>
+
+  <!-- UI -->
+  <script src="src/ui/MobileControls.js"></script>
 
   <!-- Scenes -->
   <script src="src/scenes/StartScene.js"></script>

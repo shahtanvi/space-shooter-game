@@ -80,16 +80,17 @@ class StartScene extends Phaser.Scene {
 
     // ── Input ─────────────────────────────────────────────────────────────────
     if (isMobile) {
-      // Use a native DOM event — iOS Safari only honours requestPermission()
-      // when called directly from a real browser gesture handler, not Phaser's.
-      const canvas = this.game.canvas;
-      const onTap = () => {
-        canvas.removeEventListener('touchstart', onTap);
-        canvas.removeEventListener('click',      onTap);
-        this._mobileStart();
-      };
-      canvas.addEventListener('touchstart', onTap, { once: true, passive: true });
-      canvas.addEventListener('click',      onTap, { once: true });
+      // Show a real HTML <button> — iOS only grants DeviceOrientation permission
+      // when requestPermission() is called directly inside an HTML button's click handler.
+      const prompt = document.getElementById('motion-prompt');
+      const btn    = document.getElementById('motion-btn');
+      if (prompt) prompt.style.display = 'flex';
+      if (btn) {
+        btn.onclick = () => {
+          if (prompt) prompt.style.display = 'none';
+          this._mobileStart();
+        };
+      }
     } else {
       this.input.keyboard.once('keydown-SPACE', () => {
         this.scene.start('GameScene', { calibration: 0 });
@@ -122,21 +123,20 @@ class StartScene extends Phaser.Scene {
   _captureCalibrationAndStart() {
     let started = false;
 
-    const onOrientation = (e) => {
+    const startGame = (calibration) => {
       if (started) return;
       started = true;
       window.removeEventListener('deviceorientation', onOrientation, true);
-      this.scene.start('GameScene', { calibration: e.gamma || 0 });
+      const p = document.getElementById('motion-prompt');
+      if (p) p.style.display = 'none';
+      this.scene.start('GameScene', { calibration });
     };
+
+    const onOrientation = (e) => startGame(e.gamma || 0);
     window.addEventListener('deviceorientation', onOrientation, true);
 
     // Fallback: if no orientation event fires within 800 ms, start with 0°
-    setTimeout(() => {
-      if (started) return;
-      started = true;
-      window.removeEventListener('deviceorientation', onOrientation, true);
-      this.scene.start('GameScene', { calibration: 0 });
-    }, 800);
+    setTimeout(() => startGame(0), 800);
   }
 
   _showPermissionDenied() {

@@ -43,10 +43,7 @@ class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' });
   }
 
-  // Receives calibration data passed from StartScene
-  init(data) {
-    this._calibration = data?.calibration ?? 0;
-  }
+  init() {}
 
   // ─── PRELOAD ───────────────────────────────────────────────────────────────
   preload() {
@@ -134,21 +131,28 @@ class GameScene extends Phaser.Scene {
     const baseSpeed = this.speedBoostActive ? 308 : 220;  // +40 % with boost
 
     if (this.mobileControls) {
-      // Mobile: gyroscope drives X; Y is fixed (no vertical movement on mobile)
-      this.player.setVelocityX(this.mobileControls.tiltX * baseSpeed);
-      this.player.setVelocityY(0);
-      if (this._debugText) {
-        const raw = this.mobileControls.rawGamma;
-        const rawStr = raw === null ? 'NO EVENTS' : raw.toFixed(1);
-        this._debugText.setText(`gamma: ${rawStr}  tilt: ${this.mobileControls.tiltX.toFixed(2)}  cal: ${this._calibration.toFixed(1)}`);
+      // Mobile: ship follows finger X; Y is fixed; auto-fire always on
+      if (this.shootReady) this._shoot();
+
+      const fx = this.mobileControls.fingerX;
+      if (fx !== null) {
+        const targetX = Phaser.Math.Clamp(fx, 20, this.scale.width - 20);
+        const dx      = targetX - this.player.x;
+        // Proportional velocity towards finger — feels snappy but not instant
+        const vx = Phaser.Math.Clamp(dx * 12, -baseSpeed, baseSpeed);
+        this.player.setVelocityX(vx);
+        if (dx < -4)      this.player.setFrame(1);
+        else if (dx > 4)  this.player.setFrame(3);
+        else              this.player.setFrame(0);
+      } else {
+        this.player.setVelocityX(0);
+        this.player.setFrame(0);
       }
+      this.player.setVelocityY(0);
 
-      const tx = this.mobileControls.tiltX;
-      if (tx < -0.2)     this.player.setFrame(1);
-      else if (tx > 0.2) this.player.setFrame(3);
-      else               this.player.setFrame(0);
-
-      if (this.mobileControls.firing && this.shootReady) this._shoot();
+      if (this._debugText) {
+        this._debugText.setText(`finger: ${fx !== null ? Math.round(fx) : '—'}  ship: ${Math.round(this.player.x)}`);
+      }
     } else {
       // Desktop: keyboard
       const left  = this.cursors.left.isDown  || this.wasd.left.isDown;
@@ -250,7 +254,6 @@ class GameScene extends Phaser.Scene {
     this.bossActive       = false;
     this._bossPlanet      = null;
     this.mobileControls   = null;
-    // _calibration is set in init() — not reset here so it survives create()
   }
 
   _createBackground() {
@@ -323,12 +326,12 @@ class GameScene extends Phaser.Scene {
 
     this.pKey.on('down', this._togglePause, this);
 
-    // Mobile controls — gyro + fire button (only on touch devices)
+    // Mobile controls — drag to move + auto-fire (only on touch devices)
     if (MobileControls.isMobile()) {
       this.mobileControls = new MobileControls(this);
-      this.mobileControls.init(this._calibration);
+      this.mobileControls.init();
 
-      // DEBUG — tilt readout (remove once gyro is confirmed working)
+      // DEBUG — finger position readout (remove once confirmed working)
       this._debugText = this.add.text(10, 56, '', {
         fontFamily: '"Courier New", monospace', fontSize: '11px', fill: '#00ffcc'
       }).setDepth(20).setScrollFactor(0);

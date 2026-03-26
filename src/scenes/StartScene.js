@@ -29,7 +29,7 @@ class StartScene extends Phaser.Scene {
     // ── Controls legend ───────────────────────────────────────────────────────
     const ctrlStyle = mono(12, '#888899');
     if (isMobile) {
-      this.add.text(W / 2, 240, 'TILT  Move     HOLD RIGHT  Fire', ctrlStyle)
+      this.add.text(W / 2, 240, 'SLIDE  Move     AUTO-FIRE  Always on', ctrlStyle)
         .setOrigin(0.5);
     } else {
       this.add.text(W / 2, 240, 'ARROWS / WASD  Move     SPACE  Fire     P  Pause', ctrlStyle)
@@ -80,76 +80,10 @@ class StartScene extends Phaser.Scene {
 
     // ── Input ─────────────────────────────────────────────────────────────────
     if (isMobile) {
-      // Show a real HTML <button> — iOS only grants DeviceOrientation permission
-      // when requestPermission() is called directly inside an HTML button's click handler.
-      const prompt = document.getElementById('motion-prompt');
-      const btn    = document.getElementById('motion-btn');
-      if (prompt) prompt.style.display = 'flex';
-      if (btn) {
-        btn.onclick = () => {
-          if (prompt) prompt.style.display = 'none';
-          this._mobileStart();
-        };
-      }
+      this.input.once('pointerdown', () => this.scene.start('GameScene'));
     } else {
-      this.input.keyboard.once('keydown-SPACE', () => {
-        this.scene.start('GameScene', { calibration: 0 });
-      });
+      this.input.keyboard.once('keydown-SPACE', () => this.scene.start('GameScene'));
     }
   }
 
-  // ─── Mobile start flow ─────────────────────────────────────────────────────
-
-  _mobileStart() {
-    if (typeof DeviceOrientationEvent !== 'undefined' &&
-        typeof DeviceOrientationEvent.requestPermission === 'function') {
-      // iOS 13+ requires explicit permission from a user gesture
-      DeviceOrientationEvent.requestPermission()
-        .then(result => {
-          if (result === 'granted') {
-            this._captureCalibrationAndStart();
-          } else {
-            this._showPermissionDenied();
-          }
-        })
-        .catch(() => this._captureCalibrationAndStart());
-    } else {
-      // Android / other browsers — no permission needed
-      this._captureCalibrationAndStart();
-    }
-  }
-
-  // Listen for one orientation event to capture the player's natural holding angle.
-  _captureCalibrationAndStart() {
-    let started = false;
-
-    const startGame = (calibration) => {
-      if (started) return;
-      started = true;
-      window.removeEventListener('deviceorientation', onOrientation, true);
-      const p = document.getElementById('motion-prompt');
-      if (p) p.style.display = 'none';
-      this.scene.start('GameScene', { calibration });
-    };
-
-    const onOrientation = (e) => startGame(e.gamma || 0);
-    window.addEventListener('deviceorientation', onOrientation, true);
-
-    // Fallback: if no orientation event fires within 800 ms, start with 0°
-    setTimeout(() => startGame(0), 800);
-  }
-
-  _showPermissionDenied() {
-    const W = this.scale.width;
-    const H = this.scale.height;
-    this.add.rectangle(W / 2, H / 2, W - 40, 110, 0x110011, 0.95)
-      .setOrigin(0.5)
-      .setDepth(20);
-    this.add.text(W / 2, H / 2, 'Motion access denied.\n\nGo to Settings > Safari >\nMotion & Orientation\nand enable access, then reload.', {
-      fontFamily: '"Courier New", monospace',
-      fontSize:   '13px',
-      fill:       '#ff6666',
-      align:      'center'
-    }).setOrigin(0.5).setDepth(21);
-  }
 }

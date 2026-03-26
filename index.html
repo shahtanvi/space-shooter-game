@@ -57,26 +57,6 @@
   </style>
 </head>
 <body>
-  <!-- iOS motion permission button — shown over the canvas on mobile start -->
-  <div id="motion-prompt" style="
-    display: none;
-    position: fixed; inset: 0; z-index: 1000;
-    justify-content: center; align-items: center;
-    background: rgba(0,0,17,0.92);
-    flex-direction: column; gap: 18px;
-    font-family: 'Courier New', monospace; color: #fff; text-align: center;
-  ">
-    <div style="font-size: 15px; color: #aabbff; letter-spacing: 1px;">SPACE SHOOTER</div>
-    <button id="motion-btn" style="
-      background: #1a1a4a; border: 2px solid #4466ff;
-      color: #88ff88; font-family: 'Courier New', monospace;
-      font-size: 18px; letter-spacing: 2px;
-      padding: 18px 40px; border-radius: 6px;
-      cursor: pointer; -webkit-tap-highlight-color: transparent;
-    ">TAP TO START</button>
-    <div style="font-size: 11px; color: #444466;">Allow motion access when prompted</div>
-  </div>
-
   <!-- Portrait-only overlay — shown by CSS when touch device is in landscape -->
   <div id="landscape-msg">
     <div class="rotate-icon">&#8635;</div>

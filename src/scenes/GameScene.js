@@ -138,7 +138,9 @@ class GameScene extends Phaser.Scene {
       this.player.setVelocityX(this.mobileControls.tiltX * baseSpeed);
       this.player.setVelocityY(0);
       if (this._debugText) {
-        this._debugText.setText(`tilt: ${this.mobileControls.tiltX.toFixed(2)}  cal: ${this._calibration.toFixed(1)}`);
+        const raw = this.mobileControls.rawGamma;
+        const rawStr = raw === null ? 'NO EVENTS' : raw.toFixed(1);
+        this._debugText.setText(`gamma: ${rawStr}  tilt: ${this.mobileControls.tiltX.toFixed(2)}  cal: ${this._calibration.toFixed(1)}`);
       }
 
       const tx = this.mobileControls.tiltX;

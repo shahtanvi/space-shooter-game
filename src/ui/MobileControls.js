@@ -13,6 +13,7 @@ class MobileControls {
     this.scene    = scene;
     this.tiltX    = 0;       // -1 … +1
     this.firing   = false;   // fire button held?
+    this.rawGamma = null;    // raw gamma from last event (null = no events received)
     this._cal     = 0;       // gamma value at game-start = neutral centre
     this._handler = null;    // deviceorientation listener ref
     this._fireZone  = null;
@@ -101,6 +102,7 @@ class MobileControls {
 
     this._handler = (e) => {
       const gamma = e.gamma ?? 0;          // -90 (left) to +90 (right)
+      this.rawGamma = gamma;               // expose for debug display
       const delta = gamma - this._cal;     // apply calibration offset
 
       if (Math.abs(delta) < DEAD_ZONE) {

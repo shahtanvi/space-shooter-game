@@ -80,7 +80,16 @@ class StartScene extends Phaser.Scene {
 
     // ── Input ─────────────────────────────────────────────────────────────────
     if (isMobile) {
-      this.input.once('pointerdown', () => this._mobileStart());
+      // Use a native DOM event — iOS Safari only honours requestPermission()
+      // when called directly from a real browser gesture handler, not Phaser's.
+      const canvas = this.game.canvas;
+      const onTap = () => {
+        canvas.removeEventListener('touchstart', onTap);
+        canvas.removeEventListener('click',      onTap);
+        this._mobileStart();
+      };
+      canvas.addEventListener('touchstart', onTap, { once: true, passive: true });
+      canvas.addEventListener('click',      onTap, { once: true });
     } else {
       this.input.keyboard.once('keydown-SPACE', () => {
         this.scene.start('GameScene', { calibration: 0 });
@@ -111,19 +120,23 @@ class StartScene extends Phaser.Scene {
 
   // Listen for one orientation event to capture the player's natural holding angle.
   _captureCalibrationAndStart() {
+    let started = false;
+
     const onOrientation = (e) => {
+      if (started) return;
+      started = true;
       window.removeEventListener('deviceorientation', onOrientation, true);
       this.scene.start('GameScene', { calibration: e.gamma || 0 });
     };
     window.addEventListener('deviceorientation', onOrientation, true);
 
-    // Fallback: if the device fires no orientation event within 600 ms, start with 0°
-    this.time.delayedCall(600, () => {
+    // Fallback: if no orientation event fires within 800 ms, start with 0°
+    setTimeout(() => {
+      if (started) return;
+      started = true;
       window.removeEventListener('deviceorientation', onOrientation, true);
-      if (this.scene.isActive('StartScene')) {
-        this.scene.start('GameScene', { calibration: 0 });
-      }
-    });
+      this.scene.start('GameScene', { calibration: 0 });
+    }, 800);
   }
 
   _showPermissionDenied() {

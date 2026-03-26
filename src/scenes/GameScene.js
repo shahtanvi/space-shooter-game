@@ -137,6 +137,9 @@ class GameScene extends Phaser.Scene {
       // Mobile: gyroscope drives X; Y is fixed (no vertical movement on mobile)
       this.player.setVelocityX(this.mobileControls.tiltX * baseSpeed);
       this.player.setVelocityY(0);
+      if (this._debugText) {
+        this._debugText.setText(`tilt: ${this.mobileControls.tiltX.toFixed(2)}  cal: ${this._calibration.toFixed(1)}`);
+      }
 
       const tx = this.mobileControls.tiltX;
       if (tx < -0.2)     this.player.setFrame(1);
@@ -322,6 +325,11 @@ class GameScene extends Phaser.Scene {
     if (MobileControls.isMobile()) {
       this.mobileControls = new MobileControls(this);
       this.mobileControls.init(this._calibration);
+
+      // DEBUG — tilt readout (remove once gyro is confirmed working)
+      this._debugText = this.add.text(10, 56, '', {
+        fontFamily: '"Courier New", monospace', fontSize: '11px', fill: '#00ffcc'
+      }).setDepth(20).setScrollFactor(0);
     }
   }
 

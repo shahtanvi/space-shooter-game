@@ -149,9 +149,6 @@ class GameScene extends Phaser.Scene {
         this.player.setFrame(0);
       }
 
-      if (this._debugText) {
-        this._debugText.setText(`finger: ${fx !== null ? Math.round(fx) : '—'}  ship: ${Math.round(this.player.x)}`);
-      }
     } else {
       // Desktop: keyboard
       const left  = this.cursors.left.isDown  || this.wasd.left.isDown;
@@ -330,10 +327,6 @@ class GameScene extends Phaser.Scene {
       this.mobileControls = new MobileControls(this);
       this.mobileControls.init();
 
-      // DEBUG — finger position readout (remove once confirmed working)
-      this._debugText = this.add.text(10, 56, '', {
-        fontFamily: '"Courier New", monospace', fontSize: '11px', fill: '#00ffcc'
-      }).setDepth(20).setScrollFactor(0);
     }
   }
 

@@ -599,8 +599,9 @@ class GameScene extends Phaser.Scene {
     this.score += points;
     this.scoreText.setText(`SCORE: ${this.score}`);
 
-    // Medium and big enemies drop power-ups
-    if (type !== 'small') this.powerupManager.trySpawn(x, y);
+    // All enemy types drop power-ups; bigger enemies drop more often
+    const dropChance = type === 'big' ? 0.50 : type === 'medium' ? 0.30 : 0.10;
+    this.powerupManager.trySpawn(x, y, dropChance);
 
     this.waveManager.onKill();
   }

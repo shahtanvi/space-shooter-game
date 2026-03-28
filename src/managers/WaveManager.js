@@ -7,7 +7,6 @@ class WaveManager {
     this.scene          = scene;
     this.wave           = 1;
     this.killCount      = 0;
-    this.killsPerWave   = 10;
     this.spawnTimer     = null;
     this.bossWaveActive = false;
     this.onAdvance      = null; // set by GameScene — called with new wave number
@@ -28,11 +27,11 @@ class WaveManager {
     if (this.bossWaveActive) return; // boss wave advances only on boss death
 
     this.killCount++;
-    if (this.killCount >= this.killsPerWave) {
+    if (this.killCount >= this._killsForWave()) {
       this.killCount = 0;
       this.wave++;
 
-      if (this.wave % 10 === 0) {
+      if (this.wave % 8 === 0) {
         // Boss wave: stop regular spawning and trigger the boss
         this.stop();
         this.bossWaveActive = true;
@@ -54,6 +53,13 @@ class WaveManager {
   }
 
   // ─── Private ───────────────────────────────────────────────────────────────
+
+  // Kills needed to complete the current wave.
+  // Scaling formula: 8 + (wave × 2)  →  wave 1 = 10, wave 7 = 22
+  // To revert to flat waves, replace the return with: return 10;
+  _killsForWave() {
+    return 8 + this.wave * 2;
+  }
 
   _spawnDelay() {
     // Each wave is 18% faster; floor at 180 ms

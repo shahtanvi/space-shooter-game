@@ -508,8 +508,8 @@ class GameScene extends Phaser.Scene {
   _resetEnemyFireTimer() {
     if (this.enemyFireTimer) this.enemyFireTimer.remove();
     const wave  = this.waveManager?.wave || 1;
-    // Interval: 2000 ms → 500 ms floor, dropping 150 ms per wave
-    const delay = Math.max(500, 2000 - (wave - 1) * 150);
+    // Interval: 2000 ms → 750 ms floor, dropping 150 ms per wave
+    const delay = Math.max(750, 2000 - (wave - 1) * 150);
     this.enemyFireTimer = this.time.addEvent({
       delay,
       callback:      this._enemyFireStep,
@@ -536,7 +536,7 @@ class GameScene extends Phaser.Scene {
 
     // Frame 2 = bottom-left of laser sheet (thin bolt), tinted red so it reads as enemy
     const bolt = this.enemyBullets.create(enemy.x, enemy.y + 16, 'laser', 2);
-    bolt.setScale(1.8).setTint(0xff5566).setDepth(3);
+    bolt.setScale(2.5).setTint(0xff2200).setDepth(3);
     bolt.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
     bolt.body.setSize(8, 8).setOffset(4, 4);
   }

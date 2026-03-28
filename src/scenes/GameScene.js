@@ -187,7 +187,7 @@ class GameScene extends Phaser.Scene {
       const e = this.smallEnemies.create(x, -24, 'enemy-small');
       e.setScale(3).setFlipY(true);
       e.play('enemy-fly');
-      e.setVelocityY(wave <= 3 ? 160 + (wave - 1) * 28 : 216 + (wave - 4) * 10);
+      e.setVelocityY(wave <= 3 ? 160 + (wave - 1) * 28 : wave <= 5 ? 216 + (wave - 4) * 10 : 226 + (wave - 6) * 4);
       e.body.setSize(12, 12).setOffset(2, 2);
       e.setData({ type: 'small', hp: 1, points: 100, exploKey: 'explo-a', exploScale: 1.2 });
 
@@ -195,7 +195,7 @@ class GameScene extends Phaser.Scene {
       const e = this.mediumEnemies.create(x, -20, 'enemy-med');
       e.setScale(3).setFlipY(true);
       e.play('enemy-med-fly');
-      e.setVelocityY(wave <= 3 ? 72 + (wave - 1) * 18 : 126 + (wave - 4) * 7);
+      e.setVelocityY(wave <= 3 ? 72 + (wave - 1) * 18 : wave <= 5 ? 126 + (wave - 4) * 7 : 133 + (wave - 6) * 3);
       e.body.setSize(14, 10).setOffset(1, 3);
       e.setData({ type: 'medium', hp: 2, points: 250, exploKey: 'explo-b', exploScale: 0.85 });
 
@@ -203,7 +203,7 @@ class GameScene extends Phaser.Scene {
       const e = this.bigEnemies.create(x, -36, 'enemy-big');
       e.setScale(3).setFlipY(true);
       e.play('enemy-big-pulse');
-      e.setVelocityY(wave <= 3 ? 50 + (wave - 1) * 12 : 74 + (wave - 4) * 5);
+      e.setVelocityY(wave <= 3 ? 50 + (wave - 1) * 12 : wave <= 5 ? 74 + (wave - 4) * 5 : 79 + (wave - 6) * 2);
       e.body.setSize(28, 26).setOffset(2, 3);
       e.setData({ type: 'big', hp: 5, points: 500, exploKey: 'explo-c', exploScale: 1.1,
                   spawnX: x, spawnTime: this.time.now });

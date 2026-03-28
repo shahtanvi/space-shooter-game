@@ -1,0 +1,93 @@
+# Exclude unused Legacy Collection assets to stay under Vercel's 100MB deployment limit.
+# The game only uses: space_background_pack, SpaceShipShooter, grotto_escape_pack,
+#                     Explosions pack, and top-down-boss (~4.5 MB total).
+
+# Unused character assets
+Legacy Collection/Assets/Characters
+
+# Unused environment packs (keep only space_background_pack)
+Legacy Collection/Assets/Environments/Day-Platformer
+Legacy Collection/Assets/Environments/Gothic-Castle-Files
+Legacy Collection/Assets/Environments/Gothic-Horror-Files
+Legacy Collection/Assets/Environments/HauntedForest
+Legacy Collection/Assets/Environments/Junk Wastelands Files
+Legacy Collection/Assets/Environments/Living-Tissue-Platform-Files
+Legacy Collection/Assets/Environments/Modular-tileset
+Legacy Collection/Assets/Environments/Mountain Dusk
+Legacy Collection/Assets/Environments/Ocean View Files
+Legacy Collection/Assets/Environments/Old-dark-Castle-tileset-Files
+Legacy Collection/Assets/Environments/Overworld
+Legacy Collection/Assets/Environments/Rocky Beach environment
+Legacy Collection/Assets/Environments/Rocky Pass Files
+Legacy Collection/Assets/Environments/Rocky-Tileset
+Legacy Collection/Assets/Environments/Scifi lab Files
+Legacy Collection/Assets/Environments/Synth City
+Legacy Collection/Assets/Environments/Tiny RPG Mountain Files
+Legacy Collection/Assets/Environments/Top-Down-Forest
+Legacy Collection/Assets/Environments/Top-Down-Town
+Legacy Collection/Assets/Environments/Underwater Fantasy
+Legacy Collection/Assets/Environments/Urban-landscape-files
+Legacy Collection/Assets/Environments/Warped Zone 202
+Legacy Collection/Assets/Environments/alien-environment
+Legacy Collection/Assets/Environments/another-world
+Legacy Collection/Assets/Environments/bulkhead-walls
+Legacy Collection/Assets/Environments/caverns-files-web
+Legacy Collection/Assets/Environments/colorful-tileset
+Legacy Collection/Assets/Environments/country-platform-files
+Legacy Collection/Assets/Environments/cyberpunk-corridor-files
+Legacy Collection/Assets/Environments/cyberpunk-detective-props
+Legacy Collection/Assets/Environments/forest-road-background
+Legacy Collection/Assets/Environments/grunge-tileset-files-web
+Legacy Collection/Assets/Environments/lava-background
+Legacy Collection/Assets/Environments/mist-forest-background
+Legacy Collection/Assets/Environments/night-town-background-files
+Legacy Collection/Assets/Environments/parallax-industrial-web
+Legacy Collection/Assets/Environments/parallax_forest_pack web
+Legacy Collection/Assets/Environments/sci-fi-environment-background-files
+Legacy Collection/Assets/Environments/sci-fi-interior-platform
+Legacy Collection/Assets/Environments/ships-graveyard
+Legacy Collection/Assets/Environments/single-dungeon-crawler
+Legacy Collection/Assets/Environments/single-dungeon-crawler-objects
+Legacy Collection/Assets/Environments/top-down-dungeon-sci-fi
+Legacy Collection/Assets/Environments/top-down-space-environment
+Legacy Collection/Assets/Environments/treasure-hoard-platform
+
+# Unused game packs (keep only SpaceShipShooter and grotto_escape_pack)
+Legacy Collection/Assets/Packs/Beach Area
+Legacy Collection/Assets/Packs/Flappy Chicken
+Legacy Collection/Assets/Packs/GothicVania-town-files
+Legacy Collection/Assets/Packs/Gothicvania Cemetery
+Legacy Collection/Assets/Packs/Gothicvania Church
+Legacy Collection/Assets/Packs/Gothicvania Swamp files
+Legacy Collection/Assets/Packs/Magic Cliffs
+Legacy Collection/Assets/Packs/Meta data assets files
+Legacy Collection/Assets/Packs/Miami-synth-files
+Legacy Collection/Assets/Packs/Sewers pack files
+Legacy Collection/Assets/Packs/SpaceShooter
+Legacy Collection/Assets/Packs/Stranger Forest
+Legacy Collection/Assets/Packs/Streets of Fight
+Legacy Collection/Assets/Packs/Warped City
+Legacy Collection/Assets/Packs/asteroid-fighter
+Legacy Collection/Assets/Packs/megabot assets files
+Legacy Collection/Assets/Packs/tiny-RPG-forest-files
+Legacy Collection/Assets/Packs/tiny-rpg-town-files
+Legacy Collection/Assets/Packs/underwater-diving-files
+Legacy Collection/Assets/Packs/warped-Caves
+
+# Unused misc assets (keep only Explosions pack and top-down-boss)
+Legacy Collection/Assets/Misc/Dagger
+Legacy Collection/Assets/Misc/EnemyDeath
+Legacy Collection/Assets/Misc/EnemyProjectile
+Legacy Collection/Assets/Misc/Explosion
+Legacy Collection/Assets/Misc/Grotto-escape-2-FX
+Legacy Collection/Assets/Misc/Hit
+Legacy Collection/Assets/Misc/Rocks-Textures
+Legacy Collection/Assets/Misc/Warped Fast Ship Files
+Legacy Collection/Assets/Misc/Warped Portraits Files
+Legacy Collection/Assets/Misc/Warped Vehicles Files
+Legacy Collection/Assets/Misc/Warped shooting fx
+Legacy Collection/Assets/Misc/Water splash
+Legacy Collection/Assets/Misc/fantasy weapons set
+Legacy Collection/Assets/Misc/gems
+Legacy Collection/Assets/Misc/spaceship-unit
+Legacy Collection/Assets/Misc/tank-unit

@@ -25,7 +25,7 @@ class PowerUpManager {
 
     const type = Phaser.Utils.Array.GetRandom(PU_TYPES);
     const pu   = this.powerups.create(x, y, 'powerup', PU_FRAMES[type]);
-    pu.setScale(2.5).setDepth(3);
+    pu.setScale(3).setDepth(3);
     pu.setVelocityY(70);
     pu.powerupType = type;
     pu.body.setSize(12, 12).setOffset(2, 2);

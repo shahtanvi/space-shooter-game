@@ -525,14 +525,14 @@ class GameScene extends Phaser.Scene {
 
     // Later waves fire from multiple enemies at once
     const wave     = this.waveManager?.wave || 1;
-    const count    = wave >= 7 ? 3 : wave >= 4 ? 2 : 1;
+    const count    = wave >= 10 ? 3 : wave >= 4 ? 2 : 1;
     const shooters = Phaser.Utils.Array.Shuffle(active.slice()).slice(0, count);
     shooters.forEach(e => this._fireEnemyBolt(e));
   }
 
   _fireEnemyBolt(enemy) {
     const angle = Phaser.Math.Angle.Between(enemy.x, enemy.y, this.player.x, this.player.y);
-    const speed = 185;
+    const speed = 165;
 
     // Frame 2 = bottom-left of laser sheet (thin bolt), tinted red so it reads as enemy
     const bolt = this.enemyBullets.create(enemy.x, enemy.y + 16, 'laser', 2);
@@ -570,8 +570,9 @@ class GameScene extends Phaser.Scene {
     this.score += points;
     this.scoreText.setText(`SCORE: ${this.score}`);
 
-    // Medium and big enemies drop power-ups
-    if (type !== 'small') this.powerupManager.trySpawn(x, y);
+    // All enemy types drop power-ups; bigger enemies drop more often
+    const dropChance = type === 'big' ? 0.50 : type === 'medium' ? 0.30 : 0.10;
+    this.powerupManager.trySpawn(x, y, dropChance);
 
     this.waveManager.onKill();
   }

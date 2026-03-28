@@ -25,20 +25,10 @@ class PowerUpManager {
 
     const type = Phaser.Utils.Array.GetRandom(PU_TYPES);
     const pu   = this.powerups.create(x, y, 'powerup', PU_FRAMES[type]);
-    pu.setScale(2.5).setDepth(3);
-    pu.setVelocityY(70);
+    pu.setScale(3).setDepth(3);
+    pu.setVelocityY(130);
     pu.powerupType = type;
     pu.body.setSize(12, 12).setOffset(2, 2);
-
-    // Bobbing motion to attract the player's eye
-    this.scene.tweens.add({
-      targets:  pu,
-      y:        y + 10,
-      duration: 700,
-      ease:     'Sine.easeInOut',
-      repeat:   -1,
-      yoyo:     true
-    });
   }
 
   collect(powerup) {
